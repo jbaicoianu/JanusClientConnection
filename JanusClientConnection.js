@@ -302,7 +302,8 @@ var JanusClientConnection = function(opts)
 {
   this._userId = opts.userId;
   this._roomUrl = opts.roomUrl;
-  this._version = opts.version;
+  this._password = opts.password || '';
+  this._version = opts.version || 'JanusWeb 0.1';
   this._websocket = new WebSocket(opts.host, 'binary');
   this._websocket.onopen = function() {
     this.sendLogon();
@@ -319,6 +320,7 @@ JanusClientConnection.prototype.sendLogon = function() {
     'method': 'logon',
     'data': {
       'userId': this._userId,
+      'password': this._password,
       'version': this._version,
       'roomId': md5(this._roomUrl)
     }
