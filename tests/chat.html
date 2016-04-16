@@ -1,0 +1,52 @@
+<script src="../JanusClientConnection.js"></script>
+<script>
+  /**
+   * JanusWeb chat
+   * Connect to a server and allow two-way chat with users in VR
+   */
+  var client = new JanusClientConnection({
+    host: 'ws://janusweb.lnq.to:5566',
+    userId: 'WebClientUser' + Math.floor(Math.random() * 100000),
+    roomUrl: 'http://www.janusvr.com/index.html'
+  });
+
+  client.addEventListener('connect', handleConnect);
+  client.addEventListener('message', handleMessage);
+
+  function addMessage(msg) {
+    // Add new message to bottom of chat list, and scroll to bottom
+    var li = document.createElement('li');
+    li.innerHTML = msg;
+
+    var messages = document.getElementById('chat');
+    messages.appendChild(li);
+    messages.scrollTop = messages.scrollHeight;
+  }
+  function handleConnect(ev) {
+    console.log('client connected', ev);
+
+    addMessage('Connected to server as ' + client._userId);
+  }
+  function handleMessage(ev) {
+    var msg = ev.data;
+    console.log('got message', msg);
+
+    if (msg.method == 'user_chat') {
+      addMessage('[' + msg.data.userId + '] ' + msg.data.message);
+    }
+  }
+  function sendMessage() {
+    var input = document.getElementById('chat_input');
+    if (input.value.length > 0) {
+      client.send({'method': 'chat', data: input.value});
+      addMessage('[' + client._userId + '] ' + input.value);
+      input.value = '';
+      input.focus();
+    }
+  }
+</script>
+
+<ul id="chat" style="max-height: 80em; overflow: auto; border: 1px solid black; font-family: monospace; white-space: pre;"></ul>
+<form onsubmit="sendMessage(); return false;" >
+  <input id="chat_input" placeholder="Say something!" autofocus="true">
+</form>

@@ -1,0 +1,9 @@
+Janus Client Connection
+=======================
+A library for connecting to JanusVR presence servers using WebSockets.  Example:
+
+    var client = new JanusClientConnection({
+      host: 'ws://janusweb.lnq.to:5566',
+      userId: 'WebUser',
+      roomUrl: 'http://janusvr.com/lobby.html'
+    });
