@@ -7,7 +7,9 @@
   var client = new JanusClientConnection({
     host: 'ws://janusweb.lnq.to:5566',
     userId: 'WebClientUser' + Math.floor(Math.random() * 100000),
-    roomUrl: 'http://www.janusvr.com/index.html'
+    //roomUrl: 'http://www.janusvr.com/index.html'
+    //roomUrl: 'http://q.vrsites.com/playroom/'
+    roomUrl: 'http://amy.vrsites.com/4/371'
   });
 
   client.addEventListener('connect', handleConnect);
@@ -28,7 +30,7 @@
   }
   function handleMessage(ev) {
     var msg = ev.data;
-    console.log('got message', msg);
+    //console.log('got message', msg);
 
     var msgstr = '[' + msg.method + ']';
     if (msg.data) msgstr += ' ' + JSON.stringify(msg.data, null, 2);

@@ -1,0 +1,64 @@
+<script src="../JanusClientConnection.js"></script>
+<script>
+  /**
+   * Room change test
+   * Connect to a server and make an object in the playroom bounce up and down
+   */
+  var client = new JanusClientConnection({
+    host: 'wss://janusweb.lnq.to:5567',
+    userId: 'WebClientUser' + Math.floor(Math.random() * 100000),
+    roomUrl: 'http://q.vrsites.com/playroom/'
+  });
+
+  client.addEventListener('connect', handleConnect);
+  client.addEventListener('message', handleMessage);
+
+  function addMessage(msg) {
+    // Add new message to top of messages list
+    var li = document.createElement('li');
+    li.innerHTML = msg;
+
+    var messages = document.getElementById('messages');
+    messages.insertBefore(li, messages.firstChild);
+  }
+  function handleConnect(ev) {
+    console.log('client connected', ev);
+
+    addMessage('Connected to server as ' + client._userId);
+  }
+  function handleMessage(ev) {
+    var msg = ev.data;
+    //console.log('got message', msg);
+
+    var msgstr = '[' + msg.method + ']';
+    if (msg.data) msgstr += ' ' + JSON.stringify(msg.data, null, 2);
+    //addMessage(msgstr);
+  }
+  var bounceSpeed = 1;
+  var ballColor = 'ffff00';
+  setInterval(function() {
+    var now = new Date().getTime() / 1000;
+
+    var ypos = Math.sin(now * bounceSpeed) / 2 + 5.5;
+    var yvel = Math.cos(now * bounceSpeed) / 2;
+    var yaccel = -Math.sin(now * bounceSpeed) / 2;
+
+    var editsrc = '<Object id=^sphere^ js_id=^qster123-109-1438690244^ locked=^false^ onclick=^^ oncollision=^^ interp_time=^0.1^ pos=^0 ' + ypos + ' 8^ vel=^0 ' + yvel + ' 0^ accel=^0 ' + yaccel + ' 0^ xdir=^-0.877864 0.005427 -0.478913^ ydir=^0.003806 0.999983 0.004355^ zdir=^0.478921 0.002 -0.877856^ scale=^1 1 1^ col=^#' + ballColor + '^ lighting=^true^ visible=^true^ shader_id=^^ anim_id=^^ anim_speed=^1^ cull_face=^back^ collision_id=^sphere^ collision_radius=^0^ collision_response=^true^ websurface_id=^^ video_id=^^ image_id=^^ rotate_axis=^0 1 0^ rotate_deg_per_sec=^0^ blend0_id=^^ blend1_id=^^ blend2_id=^^ blend3_id=^^ blend_src=^src_alpha^ blend_dest=^one_minus_src_alpha^ />';
+
+    client.send({method: 'move', data: { room_edit: editsrc }});
+  }, 80);
+
+  function setBounces(bounces) {
+    bounceSpeed = bounces;
+    document.getElementById('speed').innerHTML = bounces;
+    addMessage('Set bounce speed ' + bounces);
+  }
+  function setColor(color) {
+    ballColor = color;
+  }
+</script>
+
+<input id="test" type="range" value=1 min=0 max=10 oninput="setBounces(this.value)"/> <label for="speed" id="speed">1</label>
+<button onclick="setColor('ff0000')">Red</button><button onclick="setColor('00ff00')">Green</button><button onclick="setColor('0000ff')">Blue</button><button onclick="setColor('ffff00')">Yellow</button><button onclick="setColor('00ffff')">Cyan</button><button onclick="setColor('ff00ff')">Purple</button><button onclick="setColor('ffffff')">White</button>
+<ul id="messages" style="max-height: 80em; overflow: auto; border: 1px solid black; font-family: monospace; white-space: pre;"></ul>
+
